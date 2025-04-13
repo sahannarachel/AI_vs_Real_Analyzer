@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batch Analysis Results - AI vs Human Image Detector</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-robot"></i> AI vs Human Image Detector</h1>
+            <a href="{{ url_for('index') }}" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Upload</a>
+        </header>
+
+        <div class="batch-result-page">
+            <div class="result-header">
+                <h2>Batch Analysis Results</h2>
+                <div class="result-meta">
+                    <span id="timestamp">Analyzed on {{ analysis_timestamp }}</span>
+                </div>
+            </div>
+
+            <div class="batch-summary-container">
+                <h3>Summary</h3>
+                <div class="stats-grid">
+                    <div class="stat-card total">
+                        <div class="stat-icon">
+                            <i class="fas fa-images"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value">{{ results.total }}</div>
+                            <div class="stat-label">Total Images</div>
+                        </div>
+                    </div>
+                    <div class="stat-card ai">
+                        <div class="stat-icon">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value">{{ results.ai }}</div>
+                            <div class="stat-label">AI-Generated</div>
+                        </div>
+                    </div>
+                    <div class="stat-card human">
+                        <div class="stat-icon">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value">{{ results.human }}</div>
+                            <div class="stat-label">Human Photos</div>
+                        </div>
+                    </div>
+                    <div class="stat-card failed">
+                        <div class="stat-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value">{{ results.failed }}</div>
+                            <div class="stat-label">Failed</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="pie-chart-container">
+                        <canvas id="resultsPieChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="batch-actions">
+                <a href="{{ results.report_url }}" class="action-btn download-report" target="_blank">
+                    <i class="fas fa-file-alt"></i> View Full Report
+                </a>
+                <a href="{{ url_for('index') }}" class="action-btn analyze-another">
+                    <i class="fas fa-plus"></i> Start New Batch
+                </a>
+            </div>
+
+            <div class="batch-results-list">
+                <h3>Detailed Results</h3>
+                <div class="filter-controls">
+                    <button class="filter-btn active" data-filter="all">All ({{ results.total }})</button>
+                    <button class="filter-btn" data-filter="ai">AI ({{ results.ai }})</button>
+                    <button class="filter-btn" data-filter="human">Human ({{ results.human }})</button>
+                </div>
+                
+                <div class="results-grid">
+                    {% for result in results.results %}
+                    <div class="result-card {{ result.predicted_class }}">
+                        <div class="card-img">
+                            <img src="{{ result.image_url }}" alt="{{ result.filename }}">
+                            <div class="prediction-badge {{ result.predicted_class }}">
+                                {{ result.predicted_class|upper }}
+                            </div>
+                        </div>
+                        <div class="card-details">
+                            <div class="filename">{{ result.filename }}</div>
+                            <div class="confidence">
+                                Confidence: <span>{{ (result.confidence * 100)|round(1) }}%</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 AI vs Human Image Detector | Powered by PyTorch and Computer Vision</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize pie chart for results distribution
+            const ctx = document.getElementById('resultsPieChart').getContext('2d');
+            const resultsPieChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['AI-Generated', 'Human Photos', 'Failed'],
+                    datasets: [{
+                        data: [{{ results.ai }}, {{ results.human }}, {{ results.failed }}],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.7)',
+                            'rgba(75, 192, 192, 0.7)',
+                            'rgba(201, 203, 207, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgb(255, 99, 132)',
+                            'rgb(75, 192, 192)',
+                            'rgb(201, 203, 207)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Results Distribution'
+                        }
+                    }
+                }
+            });
+
+            // Filter controls for results
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const resultCards = document.querySelectorAll('.result-card');
+
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Update active class
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Apply filter
+                    const filter = this.dataset.filter;
+                    resultCards.forEach(card => {
+                        if (filter === 'all' || card.classList.contains(filter)) {
+                            card.style.display = 'block';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
