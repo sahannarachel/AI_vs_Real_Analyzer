@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Result - AI vs Human Image Detector</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-robot"></i> AI vs Human Image Detector</h1>
+            <a href="{{ url_for('index') }}" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Upload</a>
+        </header>
+
+        <div class="result-page">
+            <div class="result-header">
+                <h2>Analysis Results</h2>
+                <div class="result-meta">
+                    <span id="timestamp">Analyzed on {{ analysis_timestamp }}</span>
+                </div>
+            </div>
+
+            <div class="result-container">
+                <div class="result-image-container">
+                    <h3>Analyzed Image</h3>
+                    <div class="result-image">
+                        <img src="{{ image_url }}" alt="Analyzed image">
+                        <div class="filename">{{ original_filename }}</div>
+                    </div>
+                </div>
+
+                <div class="result-details">
+                    <div class="prediction-result {{ prediction_class }}">
+                        <div class="prediction-icon">
+                            {% if prediction_class == 'ai' %}
+                                <i class="fas fa-robot"></i>
+                            {% else %}
+                                <i class="fas fa-user"></i>
+                            {% endif %}
+                        </div>
+                        <div class="prediction-text">
+                            <h3>{{ prediction_class|upper }}</h3>
+                            <div class="confidence">
+                                Confidence: <span>{{ confidence|round(4) * 100 }}%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="analysis-details">
+                        <h3>Analysis Details</h3>
+                        
+                        <div class="detail-section">
+                            <h4>Model Predictions</h4>
+                            <div class="model-predictions">
+                                {% for model_name, probs in model_results.items() %}
+                                <div class="model-result">
+                                    <div class="model-name">{{ model_name }}</div>
+                                    <div class="model-chart">
+                                        <div class="chart-bars">
+                                            <div class="bar ai" style="width: {{ probs.ai * 100 }}%">AI: {{ (probs.ai * 100)|round(1) }}%</div>
+                                            <div class="bar human" style="width: {{ probs.human * 100 }}%">Human: {{ (probs.human * 100)|round(1) }}%</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        {% if metadata_analysis %}
+                        <div class="detail-section">
+                            <h4>Metadata Analysis</h4>
+                            <div class="metadata-results">
+                                {% if metadata_analysis.ai_signs %}
+                                <div class="metadata-category ai">
+                                    <h5>AI Indicators:</h5>
+                                    <ul>
+                                        {% for sign in metadata_analysis.ai_signs %}
+                                        <li>{{ sign }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                {% endif %}
+                                
+                                {% if metadata_analysis.human_signs %}
+                                <div class="metadata-category human">
+                                    <h5>Human Indicators:</h5>
+                                    <ul>
+                                        {% for sign in metadata_analysis.human_signs %}
+                                        <li>{{ sign }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if explanation %}
+                        <div class="detail-section">
+                            <h4>Explanation</h4>
+                            <div class="explanation">
+                                <p class="summary">{{ explanation.summary }}</p>
+                                
+                                {% if explanation.key_features %}
+                                <h5>Key Features Detected:</h5>
+                                <ul class="key-features">
+                                    {% for feature in explanation.key_features %}
+                                    <li>{{ feature }}</li>
+                                    {% endfor %}
+                                </ul>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="actions">
+                        <a href="{{ report_url }}" class="action-btn download-report" target="_blank">
+                            <i class="fas fa-file-alt"></i> View Full Report
+                        </a>
+                        <a href="{{ url_for('index') }}" class="action-btn analyze-another">
+                            <i class="fas fa-plus"></i> Analyze Another Image
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 AI vs Human Image Detector | Powered by PyTorch and Computer Vision</p>
+    </footer>
+
+    <script>
+        // You can add any result-specific JavaScript here
+        document.addEventListener('DOMContentLoaded', function() {
+            // Any initialization code for the result page
+        });
+    </script>
+</body>
+</html>
