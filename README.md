@@ -37,7 +37,7 @@ This project is a Flask-based interactive web application that detects whether a
 
 ### 1. Clone the Repo
 ```bash
-git clone https://github.com/sahannarachel/AI_vs_Real_Analyzer.git
+git clone https://github.com/sahannarachel/ai_image_detector.git
 cd ai-image-detector
 ```
 
