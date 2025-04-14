@@ -24,14 +24,6 @@ This project is a Flask-based interactive web application that detects whether a
 
 ---
 
-## Demo
-
-> Upload a single image or batch to analyze and download a full report.
-
-<img src="demo/demo_screenshot.png" alt="Web UI demo" width="700"/>
-
----
-
 ## Model Ensemble
 
 - Base models: ResNet50, Vision Transformer, Custom CNN
