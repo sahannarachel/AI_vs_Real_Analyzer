@@ -1,0 +1,34 @@
+# Web framework
+Flask
+
+# Deep learning
+torch
+torchvision
+
+# Transformers and pretrained models
+transformers
+huggingface-hub
+sentencepiece
+safetensors
+
+# Image processing
+Pillow
+opencv-python
+scikit-image
+tqdm
+
+# EXIF metadata
+piexif
+exifread
+
+# Utility
+numpy
+matplotlib
+scikit-learn
+joblib
+jinja2
+
+# HTML report generation
+markdown2
+
+
